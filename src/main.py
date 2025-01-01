@@ -4,12 +4,12 @@
 import sys
 import shutil
 
-from utils.globals import BASE_PATH
-from utils.trace   import Trace
-from utils.file    import create_folder
+from utils.globals   import BASE_PATH
+from utils.trace     import Trace
+from utils.file      import create_folder
+from utils.beautify  import beautify_file
 
 from rekursion import get_filepaths_ancor
-from beautify  import beautify_file
 
 DATA_PATH = BASE_PATH / "data"
 IMPORT_PATH = DATA_PATH / "import"
@@ -23,29 +23,20 @@ def main():
 
         if source.suffix == ".js":
             beautify_file( "JS", source.parent, source.name, dest.parent, dest.name )
-            continue
 
-        if source.suffix == ".css":
+        elif source.suffix == ".css":
             beautify_file( "CSS", source.parent, source.name, dest.parent, dest.name )
-            continue
 
-        if source.suffix == ".json":
+        elif source.suffix == ".json":
             beautify_file( "JSON", source.parent, source.name, dest.parent, dest.name )
-            continue
 
-        if source.suffix == ".xml":
+        elif source.suffix in [".xml", ".rels"]:
             beautify_file( "XML", source.parent, source.name, dest.parent, dest.name )
-            continue
 
-        if source.suffix == ".png":
-            # print( "JSON" )
-            continue
-
-        create_folder(dest.parent)
-        shutil.copy2(source, dest)
-        Trace.info( f"copy '{source}' -> '{dest}'" )
-
-        # Trace.info( f"File '{source}' not supported" )
+        else:
+            create_folder(dest.parent)
+            shutil.copy2(source, dest)
+            Trace.info( f"copy '{source}'" )
 
 
 if __name__ == "__main__":
