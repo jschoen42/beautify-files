@@ -63,7 +63,7 @@ def expand_css(text: str) -> str:
         text = text.replace(key, value)
     return text
 
-@duration("beautify '{1}\{2}'")
+@duration("beautify '{1}\\{2}'")
 def beautify_file( file_type: str, source_path: Path | str, source_filename: str, dest_path: Path | str, dest_filename: str ) -> bool:
     source = Path(source_path, source_filename)
     dest   = Path(dest_path, dest_filename)
@@ -84,11 +84,19 @@ def beautify_file( file_type: str, source_path: Path | str, source_filename: str
         data = expand_css( cssbeautifier.beautify(text, opts) )
 
     elif file_type == "JSON":
-        data = json.dumps(json.loads(text), indent=2)
+        try:
+            data = json.dumps(json.loads(text), indent=2)
+        except ValueError as err:
+            Trace.error( f"JSON parse error: {err} - {source}" )
+            data = text
 
     elif file_type == "XML":
-        x = etree.fromstring(text)
-        data = etree.tostring(x, pretty_print=True, encoding=str)
+        try:
+            x = etree.fromstring(text)
+            data = etree.tostring(x, pretty_print=True, encoding=str)
+        except ValueError as err:
+            Trace.error( f"XML parse error: {err} - {source}" )
+            data = text
 
     else:
         Trace.error( f"unknown file type '{file_type}'" )

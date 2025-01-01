@@ -1,4 +1,4 @@
-## Beautify JS/CSS
+## Beautify JS/CSS/XML/JSON
 
 beautify/unpack js, css, xml, json files
 
