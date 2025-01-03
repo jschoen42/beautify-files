@@ -15,8 +15,13 @@ DATA_PATH = BASE_PATH / "data"
 IMPORT_PATH = DATA_PATH / "import"
 EXPORT_PATH = DATA_PATH / "export"
 
+EXCLUDE = {
+    "folder": [".git", ".venv", "__pycache__", "__MACOSX"],
+    "files": []
+}
+
 def main():
-    files, _dirs, _error = get_filepaths_ancor( IMPORT_PATH )
+    files, _dirs, _error = get_filepaths_ancor( IMPORT_PATH, exclude = EXCLUDE )
     for file in files:
         source = IMPORT_PATH / file
         dest   = EXPORT_PATH / file

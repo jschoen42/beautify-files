@@ -1,14 +1,15 @@
 """
-    © Jürgen Schoenemeyer, 31.12.2024
+    © Jürgen Schoenemeyer, 03.01.2025
 
     PUBLIC:
      - format_subtitle( start_time: float, end_time: float, text: str, color=True ) -> str
      - format_timestamp(seconds: float, always_include_hours: bool=False, decimal_marker: str=".", fps: float = 30) -> str
 
-     - import_text(folderpath: Path | str, filename: Path|str, show_error: bool=True) -> str | None:
+     - import_text(folderpath: Path | str, filename: Path|str, encoding: str="utf-8", show_error: bool=True) -> str | None:
      - import_json_timestamp(folderpath: Path | str, filename: str, show_error: bool=True) -> Tuple[dict | None, float | None]
      - import_json(folderpath: Path | str, filename: str, show_error: bool=True) -> dict | None
-     - export_text(folderpath: Path | str, filename: str, text: str, timestamp: int=0, create_new_folder: bool=True, encoding: str = "utf-8", ret_lf: bool=False, show_message: bool=True) -> str | None
+
+     - export_text(folderpath: Path | str, filename: str, text: str, encoding: str = "utf-8", timestamp: int=0, ret_lf: bool=False, create_new_folder: bool=True, show_message: bool=True) -> str | None
      - export_json(folderpath: Path | str, filename: str, data: dict | list, timestamp = None) -> str | None
 
     class CacheJSON:
@@ -77,12 +78,12 @@ def format_timestamp(seconds: float, always_include_hours: bool=False, decimal_m
         f"{hours_marker}{minutes:02d}:{seconds:02d}{decimal_marker}{milliseconds:03d}"
    )
 
-def import_text(folderpath: Path | str, filename: Path|str, show_error: bool=True) -> str | None:
+def import_text(folderpath: Path | str, filename: Path|str, encoding: str="utf-8", show_error: bool=True) -> str | None:
     filepath = Path(folderpath, filename)
 
     if filepath.is_file():
         try:
-            with open(filepath, encoding="utf-8") as file:
+            with open(filepath, encoding=encoding) as file:
                 data = file.read()
             return data
 
@@ -113,7 +114,7 @@ def import_json(folderpath: Path | str, filename: str, show_error: bool=True) ->
     else:
         return None
 
-def export_text(folderpath: Path | str, filename: str, text: str, timestamp: int=0, create_new_folder: bool=True, encoding: str = "utf-8", ret_lf: bool=False, show_message=True) -> str | None:
+def export_text(folderpath: Path | str, filename: str, text: str, encoding: str = "utf-8", timestamp: int=0, ret_lf: bool=False, create_new_folder: bool=True, show_message: bool=True) -> str | None:
     folderpath = Path(folderpath)
     filepath   = Path(folderpath, filename)
 
