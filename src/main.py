@@ -22,7 +22,7 @@ def main():
         dest   = EXPORT_PATH / file
 
         if source.suffix == ".js":
-            beautify_file( "JS", source.parent, source.name, dest.parent, dest.name )
+            beautify_file( "JS", source.parent, source.name, dest.parent, dest.name.replace(".min.", ".max.") )
 
         elif source.suffix == ".css":
             beautify_file( "CSS", source.parent, source.name, dest.parent, dest.name )
@@ -47,4 +47,4 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         Trace.exception("KeyboardInterrupt")
-        sys.exit(0)
+        sys.exit()

@@ -5,6 +5,7 @@ description = "Add your description here"
 authors = [
   { name="Jürgen Schoenemeyer", email="js007@web.de" },
 ]
+license = {file = "LICENSE"}
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

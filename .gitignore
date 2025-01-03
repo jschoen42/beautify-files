@@ -4,6 +4,8 @@ result/*
 data/import/*
 !data/import/.gitkeep
 
+data/import-old/*
+
 data/export/*
 !data/export/.gitkeep
 

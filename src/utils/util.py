@@ -90,6 +90,10 @@ def import_text(folderpath: Path | str, filename: Path|str, show_error: bool=Tru
             Trace.error(f"{error}")
             return None
 
+        except UnicodeDecodeError as error:
+            Trace.error(f"{filepath}: {error}")
+            return None
+
     else:
         if show_error:
             Trace.error(f"file not exist {filepath}")
