@@ -1,21 +1,21 @@
 """
-    © Jürgen Schoenemeyer, 03.01.2025
+    © Jürgen Schoenemeyer, 06.01.2025
 
     PUBLIC:
      - format_subtitle( start_time: float, end_time: float, text: str, color=True ) -> str
      - format_timestamp(seconds: float, always_include_hours: bool=False, decimal_marker: str=".", fps: float = 30) -> str
 
      - import_text(folderpath: Path | str, filename: Path|str, encoding: str="utf-8", show_error: bool=True) -> str | None:
-     - import_json_timestamp(folderpath: Path | str, filename: str, show_error: bool=True) -> Tuple[dict | None, float | None]
-     - import_json(folderpath: Path | str, filename: str, show_error: bool=True) -> dict | None
+     - import_json_timestamp(folderpath: Path | str, filename: str, show_error: bool=True) -> Tuple[Dict | None, float | None]
+     - import_json(folderpath: Path | str, filename: str, show_error: bool=True) -> Dict | None
 
-     - export_text(folderpath: Path | str, filename: str, text: str, encoding: str = "utf-8", timestamp: int=0, ret_lf: bool=False, create_new_folder: bool=True, show_message: bool=True) -> str | None
-     - export_json(folderpath: Path | str, filename: str, data: dict | list, timestamp = None) -> str | None
+     - export_text(folderpath: Path | str, filename: str, text: str, encoding: str = "utf-8", timestamp: float=0, ret_lf: bool=False, create_new_folder: bool=True, show_message: bool=True) -> str | None
+     - export_json(folderpath: Path | str, filename: str, data: Dict | List, timestamp = None) -> str | None
 
     class CacheJSON:
       - def __init__(self, path: Path | str, name: str, model: str, reset: bool)
-      - def get(self, value_hash: str) -> dict | None
-      - def add(self, value_hash: str, value: dict) -> None
+      - def get(self, value_hash: str) -> Dict | None
+      - def add(self, value_hash: str, value: Dict) -> None
       - def flush(self) -> None:
 
     class ProcessLog (array cache)
@@ -24,21 +24,20 @@
 
 """
 
-import codecs
 import json
 
-from typing import Tuple
+from typing import Dict, List, Tuple
 from pathlib import Path
 
 from utils.trace import Trace, Color
 from utils.file  import create_folder, get_modification_timestamp, set_modification_timestamp
 
-def format_subtitle( start_time: float, end_time: float, text: str, color=True ) -> str:
+def format_subtitle( start_time: float, end_time: float, text: str, color: bool=True ) -> str:
     start = format_timestamp(start_time)
     end   = format_timestamp(end_time)
 
     if color:
-        return f"{Color.BOLD.value}{Color.MAGENTA.value}[{start} --> {end}]{Color.NORMAL.value}{text}{Color.RESET.value}"
+        return f"{Color.BOLD}{Color.MAGENTA}[{start} --> {end}]{Color.NORMAL}{text}{Color.RESET}"
     else:
         return f"[{start} --> {end}]{text}"
 
@@ -78,7 +77,7 @@ def format_timestamp(seconds: float, always_include_hours: bool=False, decimal_m
         f"{hours_marker}{minutes:02d}:{seconds:02d}{decimal_marker}{milliseconds:03d}"
    )
 
-def import_text(folderpath: Path | str, filename: Path|str, encoding: str="utf-8", show_error: bool=True) -> str | None:
+def import_text(folderpath: Path | str, filename: Path | str, encoding: str="utf-8", show_error: bool=True) -> str | None:
     filepath = Path(folderpath, filename)
 
     if filepath.is_file():
@@ -100,21 +99,21 @@ def import_text(folderpath: Path | str, filename: Path|str, encoding: str="utf-8
             Trace.error(f"file not exist {filepath}")
         return None
 
-def import_json_timestamp(folderpath: Path | str, filename: str, show_error: bool=True) -> Tuple[dict | None, float | None]:
-    ret = import_json(folderpath, filename, show_error )
+def import_json_timestamp(folderpath: Path | str, filename: str, show_error: bool=True) -> Tuple[Dict | None, float | None]:
+    ret = import_json(folderpath, filename, show_error=show_error)
     if ret:
         return ret, get_modification_timestamp(Path(folderpath, filename))
     else:
         return None, None
 
-def import_json(folderpath: Path | str, filename: str, show_error: bool=True) -> dict | None:
-    result = import_text(folderpath, filename, show_error)
+def import_json(folderpath: Path | str, filename: str, show_error: bool=True) -> Dict | None:
+    result = import_text(folderpath, filename, show_error=show_error)
     if result:
         return json.loads(result)
     else:
         return None
 
-def export_text(folderpath: Path | str, filename: str, text: str, encoding: str = "utf-8", timestamp: int=0, ret_lf: bool=False, create_new_folder: bool=True, show_message: bool=True) -> str | None:
+def export_text(folderpath: Path | str, filename: str, text: str, encoding: str="utf-8", timestamp: None | float=0, ret_lf: bool=False, create_new_folder: bool=True, show_message: bool=True) -> str | None:
     folderpath = Path(folderpath)
     filepath   = Path(folderpath, filename)
 
@@ -122,7 +121,7 @@ def export_text(folderpath: Path | str, filename: str, text: str, encoding: str 
         text = text.replace("\n", "\r\n")
 
     try:
-        with codecs.open(filepath, "r", encoding) as file:
+        with open(filepath, "r", encoding=encoding) as file:
             text_old = file.read()
     except OSError:
         text_old = ""
@@ -135,7 +134,7 @@ def export_text(folderpath: Path | str, filename: str, text: str, encoding: str 
         create_folder(folderpath)
 
     try:
-        with codecs.open(filepath, "w", encoding) as file:
+        with open(filepath, "w", encoding=encoding) as file:
             file.write(text)
 
         if timestamp and timestamp != 0:
@@ -154,14 +153,14 @@ def export_text(folderpath: Path | str, filename: str, text: str, encoding: str 
         Trace.error(f"{error_msg} - {filepath}")
         return None
 
-def export_json(folderpath: Path | str, filename: str, data: dict | list, timestamp = None) -> str | None:
+def export_json(folderpath: Path | str, filename: str, data: Dict | List, timestamp: float | None = None) -> str | None:
     text = json.dumps(data, ensure_ascii=False, indent=2)
 
     return export_text(folderpath, filename, text, encoding = "utf-8", timestamp = timestamp)
 
 class CacheJSON:
-    cache: dict = {}
-    path: Path = None
+    cache: Dict = {}
+    path: Path = Path()
     name: str = ""
 
     def __init__(self, path: Path | str, name: str, model: str, reset: bool):
@@ -171,29 +170,31 @@ class CacheJSON:
 
         if Path(self.path, self.name).is_file():
             if not reset:
-                self.cache = import_json(self.path, self.name)
-                Trace.info(f"{self.path}")
+                json = import_json(self.path, self.name)
+                if json:
+                    self.cache = json
+                    Trace.info(f"{self.path}")
         else:
             create_folder(self.path)
 
-    def get(self, value_hash: str) -> dict | None:
+    def get(self, value_hash: str) -> Dict | None:
         if value_hash in self.cache:
             return self.cache[value_hash]
         else:
             return None
 
-    def add(self, value_hash: str, value: dict) -> None:
+    def add(self, value_hash: str, value: Dict) -> None:
         self.cache[value_hash] = value
 
     def flush(self) -> None:
         export_json(self.path, self.name, self.cache)
 
 class ProcessLog:
-    def __init__(self):
-        self.log = []
+    def __init__(self) -> None:
+        self.log: List[str] = []
 
-    def add(self, info):
+    def add(self, info: str) -> None:
         self.log.append(info)
 
-    def get(self):
+    def get(self) -> List:
         return self.log

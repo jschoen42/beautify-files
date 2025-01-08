@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 03.02.2025
+    © Jürgen Schoenemeyer, 08.02.2025
 
     PUBLIC:
      - get_filepaths_all( path: Path, exclude: dict = None ) -> Tuple[list, list, list]
@@ -9,7 +9,6 @@
 
     PRIVAT:
      - match_not_exclude( name: str, excludes: dict ) -> bool
-
 """
 import fnmatch
 
@@ -54,11 +53,11 @@ def get_filepaths_all( path: Path, exclude: dict = {"folder": None, "files": Non
 
         except PermissionError as err:
             errors.append( path.as_posix() )
-            Trace.error( err )
+            Trace.error( f"{err}" )
 
         except NotADirectoryError as err: # symlink
             errors.append( path.as_posix() )
-            Trace.error( err )
+            Trace.error( f"{err}" )
 
     get_filepaths( path )
 
@@ -97,11 +96,11 @@ def get_filepaths_ancor( ancor_path: Path, exclude: dict = {"folder": None, "fil
 
         except PermissionError as err:
             errors.append( Path(curr_path).as_posix() )
-            Trace.error( err )
+            Trace.error( f"{err}" )
 
         except NotADirectoryError as err: # symlink
             errors.append( Path(curr_path).as_posix() )
-            Trace.error( err )
+            Trace.error( f"{err}" )
 
     get_filepaths("")
 

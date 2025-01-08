@@ -20,7 +20,7 @@ EXCLUDE = {
     "files": []
 }
 
-def main():
+def main() -> None:
     files, _dirs, _error = get_filepaths_ancor( IMPORT_PATH, exclude = EXCLUDE )
     for file in files:
         source = IMPORT_PATH / file

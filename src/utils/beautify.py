@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 01.01.2025
+    © Jürgen Schoenemeyer, 04.01.2025
 
     PUBLIC:
      - beautify_file( file_type: str, source_path: Path | str, source_filename: str, dest_path: Path | str, dest_filename: str ) -> bool:
@@ -14,17 +14,18 @@
 import os
 import json
 
+from typing import Dict
 from pathlib import Path
 
-import jsbeautifier
-import cssbeautifier
+import jsbeautifier     # type: ignore # mypy
+import cssbeautifier    # type: ignore # mypy
 from lxml import etree
 
 from utils.trace     import Trace
 from utils.decorator import duration
 from utils.util      import import_text, export_text
 
-expand_data_js: dict = {
+expand_data_js: Dict = {
     "!0":  "true",
     "!1":  "false",
 
@@ -134,7 +135,7 @@ expand_data_js: dict = {
     "~~(": "Math.floor(",
 }
 
-expand_data_css: dict = {
+expand_data_css: Dict = {
     ">":      " > ",
     "  >  ":  " > ",
 
@@ -195,4 +196,7 @@ def beautify_file( file_type: str, source_path: Path | str, source_filename: str
         Trace.error( f"unknown file type '{file_type}'" )
         return False
 
-    return export_text(dest.parent, dest.name, data, timestamp = mtime)
+    if export_text(dest.parent, dest.name, data, timestamp = mtime):
+        return True
+    else:
+        return False

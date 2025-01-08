@@ -230,3 +230,33 @@ git effort
 
 Remove the latest 3 commits
 git undo 3
+
+###################### mypy ########################
+
+https://github.com/python/typeshed/tree/main/stubs
+
+[dependency-groups]
+dev = [
+    "mypy>=1.14.1",
+    "lxml-stubs>=0.5.1",
+    "pandas-stubs>=2.2.3.241126",
+    "types-openpyxl>=3.1.5.20241225",
+    "types-pyyaml>=6.0.12.20241230",
+    "types-xmltodict>=0.14.0.20241009",
+    "types-python-dateutil>=2.9.0.20241206",
+]
+
+[tool.mypy]
+python_version = "3.12"
+mypy_path = "src"
+explicit_package_bases = true
+namespace_packages = true
+
+[[tool.mypy.overrides]]
+module = "faster_whisper.*"
+ignore_errors = true
+ignore_missing_imports = true
+
+python __mypy.py > __mypy-result.txt
+
+# type: ignore # mypy
