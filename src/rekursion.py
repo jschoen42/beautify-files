@@ -1,18 +1,18 @@
 """
-    © Jürgen Schoenemeyer, 08.02.2025
+    © Jürgen Schoenemeyer, 09.02.2025
 
     PUBLIC:
-     - get_filepaths_all( path: Path, exclude: dict = None ) -> Tuple[list, list, list]
-     - get_filepaths_ancor( ancor_path: Path, exclude: dict = None ) -> Tuple[list, list, list]:
+     - get_filepaths_all( path: Path, exclude: Dict[str, Any] = {"folder": None, "files": None}, show_result: bool = True ) -> Tuple[List[str], List[str], List[str]]
+     - get_filepaths_ancor( ancor_path: Path, exclude: Dict[str, Any] = {"folder": None, "files": None}, show_result: bool = True ) -> Tuple[List[str], List[str], List[str]]
         - ancor path: relative/absolute path
         - folder, files, error paths: relative to ancor_path
 
     PRIVAT:
-     - match_not_exclude( name: str, excludes: dict ) -> bool
+     - match_not_exclude( name: str, excludes: Dict ) -> bool
 """
 import fnmatch
 
-from typing import Tuple
+from typing import Any, Dict, List, Tuple
 from pathlib import Path
 
 from utils.trace     import Trace
@@ -23,22 +23,28 @@ from utils.decorator import duration
 #     "files": ["desktop.ini", "folderico*.ico"]
 # }
 
-def match_not_exclude( name: str, excludes: dict ) -> bool:
+def match_not_exclude( name: str, excludes: None | Dict[str, List[str]] ) -> bool:
     if excludes is None:
         return True
 
     for exclude in excludes:
         if fnmatch.fnmatch(name, exclude):
             return False
+
     return True
 
 @duration("{__name__} '{0}'")
-def get_filepaths_all( path: Path, exclude: dict = {"folder": None, "files": None}, show_result: bool = True ) -> Tuple[list, list, list]:
+def get_filepaths_all(
+    path: Path,
+    exclude: Dict[str, Any] = {"folder": None, "files": None},
+    show_result: bool = True
+) -> Tuple[List[str], List[str], List[str]]:
+
     Trace.action(f"path '{path}'")
 
-    files   = []
-    folders = []
-    errors  = []
+    files:   List[str] = []
+    folders: List[str] = []
+    errors:  List[str] = []
 
     def get_filepaths( path: Path ) -> None:
         try:
@@ -70,12 +76,17 @@ def get_filepaths_all( path: Path, exclude: dict = {"folder": None, "files": Non
     return files, folders, errors
 
 @duration("{__name__} '{0}'")
-def get_filepaths_ancor( ancor_path: Path, exclude: dict = {"folder": None, "files": None}, show_result: bool = True ) -> Tuple[list, list, list]:
+def get_filepaths_ancor(
+    ancor_path: Path,
+    exclude: Dict[str, Any] = {"folder": None, "files": None},
+    show_result: bool = True
+) -> Tuple[List[str], List[str], List[str]]:
+
     Trace.action(f"ancor '{ancor_path}'")
 
-    files   = []
-    folders = []
-    errors  = []
+    files:   List[str] = []
+    folders: List[str] = []
+    errors:  List[str] = []
 
     def get_filepaths( rel_path: str ) -> None:
         curr_path = ancor_path / rel_path

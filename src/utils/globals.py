@@ -1,10 +1,12 @@
 """
-    © Jürgen Schoenemeyer, 04.01.2025
+    © Jürgen Schoenemeyer, 27.01.2025
+
+    src/utils/globals.py
 
     PUBLIC:
      - DRIVE: Path
      - BASE_PATH: Path
-     - SYSTEM_ENV_PATHS: List
+     - SYSTEM_ENV_PATHS: List[str]
 """
 
 import os
@@ -23,4 +25,4 @@ if system_paths is None:
 if system_paths[-1:] == ";":
     system_paths = system_paths[:-1]
 
-SYSTEM_ENV_PATHS: List = system_paths.split(";")
+SYSTEM_ENV_PATHS: List[str] = system_paths.split(";")

@@ -13,16 +13,9 @@ dependencies = [
     "jsbeautifier>=1.15.1",
     "lxml>=5.3.0",
 ]
-
 [dependency-groups]
 dev = [
-    "mypy>=1.14.1",
+    "mypy>=1.15.0",
     "lxml-stubs>=0.5.1",
     "types-python-dateutil>=2.9.0.20241206",
 ]
-
-[tool.mypy]
-python_version = "3.13"
-mypy_path = "src"
-explicit_package_bases = true
-namespace_packages = true
