@@ -13,7 +13,7 @@ data/*
 
 *.7z
 __history.txt
-__mypy*.txt
+.type-check-result/*
 
 ### Python
 

@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 04.01.2025
+    © Jürgen Schoenemeyer, 19.01.2025
 
     PUBLIC:
      - beautify_file( file_type: str, source_path: Path | str, source_filename: str, dest_path: Path | str, dest_filename: str ) -> bool:
@@ -8,7 +8,6 @@
     PRIVAT:
      - expand_js(text: str) -> str:
      - expand_css(text: str) -> str:
-
 """
 
 import os
@@ -17,15 +16,17 @@ import json
 from typing import Dict
 from pathlib import Path
 
-import jsbeautifier     # type: ignore # mypy
-import cssbeautifier    # type: ignore # mypy
+import jsbeautifier        # type: ignore[import-untyped] # mypy + pyright
+import cssbeautifier       # type: ignore[import-untyped] # mypy + pyright
 from lxml import etree
 
 from utils.trace     import Trace
 from utils.decorator import duration
 from utils.util      import import_text, export_text
 
-expand_data_js: Dict = {
+# print(etree)
+
+expand_data_js: Dict[str, str] = {
     "!0":  "true",
     "!1":  "false",
 
@@ -135,7 +136,7 @@ expand_data_js: Dict = {
     "~~(": "Math.floor(",
 }
 
-expand_data_css: Dict = {
+expand_data_css: Dict[str, str] = {
     ">":      " > ",
     "  >  ":  " > ",
 

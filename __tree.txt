@@ -6,5 +6,10 @@ beautify-files v0.1.0
 │   │   └── six v1.17.0
 │   └── six v1.17.0
 ├── jsbeautifier v1.15.1 (*)
-└── lxml v5.3.0
+├── lxml v5.3.0
+├── lxml-stubs v0.5.1 (group: dev)
+├── mypy v1.14.1 (group: dev)
+│   ├── mypy-extensions v1.0.0
+│   └── typing-extensions v4.12.2
+└── types-python-dateutil v2.9.0.20241206 (group: dev)
 (*) Package tree already displayed

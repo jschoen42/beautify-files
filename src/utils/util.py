@@ -1,5 +1,7 @@
 """
-    © Jürgen Schoenemeyer, 06.01.2025
+    © Jürgen Schoenemeyer, 19.01.2025
+
+    src/utils/util.py
 
     PUBLIC:
      - format_subtitle( start_time: float, end_time: float, text: str, color=True ) -> str
@@ -21,12 +23,11 @@
     class ProcessLog (array cache)
       - add
       - get
-
 """
 
 import json
 
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 from pathlib import Path
 
 from utils.trace import Trace, Color
@@ -99,17 +100,18 @@ def import_text(folderpath: Path | str, filename: Path | str, encoding: str="utf
             Trace.error(f"file not exist {filepath}")
         return None
 
-def import_json_timestamp(folderpath: Path | str, filename: str, show_error: bool=True) -> Tuple[Dict | None, float | None]:
+def import_json_timestamp(folderpath: Path | str, filename: str, show_error: bool=True) -> Tuple[Dict[str, float] | None, float | None]:
     ret = import_json(folderpath, filename, show_error=show_error)
     if ret:
         return ret, get_modification_timestamp(Path(folderpath, filename))
     else:
         return None, None
 
-def import_json(folderpath: Path | str, filename: str, show_error: bool=True) -> Dict | None:
+def import_json(folderpath: Path | str, filename: str, show_error: bool=True) -> Dict[Any, Any] | None:
     result = import_text(folderpath, filename, show_error=show_error)
     if result:
-        return json.loads(result)
+        data: Dict[Any, Any] = json.loads(result)
+        return data
     else:
         return None
 
@@ -120,15 +122,19 @@ def export_text(folderpath: Path | str, filename: str, text: str, encoding: str=
     if ret_lf:
         text = text.replace("\n", "\r\n")
 
+    exist = False
     try:
         with open(filepath, "r", encoding=encoding) as file:
             text_old = file.read()
+            exist = True
     except OSError:
         text_old = ""
 
-    if text == text_old and show_message:
-        Trace.info(f"not changed '{filepath}'")
-        return str(filename)
+    if exist:
+        if text == text_old:
+            if show_message:
+                Trace.info(f"not changed '{filepath}'")
+            return str(filename)
 
     if create_new_folder:
         create_folder(folderpath)
@@ -153,17 +159,19 @@ def export_text(folderpath: Path | str, filename: str, text: str, encoding: str=
         Trace.error(f"{error_msg} - {filepath}")
         return None
 
-def export_json(folderpath: Path | str, filename: str, data: Dict | List, timestamp: float | None = None) -> str | None:
+def export_json(folderpath: Path | str, filename: str, data: Dict[Any, Any] | List[Any], timestamp: float | None = None) -> str | None:
     text = json.dumps(data, ensure_ascii=False, indent=2)
 
     return export_text(folderpath, filename, text, encoding = "utf-8", timestamp = timestamp)
 
 class CacheJSON:
-    cache: Dict = {}
+    cache: Dict[Any, Any] = {}
     path: Path = Path()
     name: str = ""
 
     def __init__(self, path: Path | str, name: str, model: str, reset: bool):
+        super().__init__()
+
         self.cache = {}
         self.path = Path(path)
         self.name = name + "-" + model + ".json"
@@ -177,13 +185,14 @@ class CacheJSON:
         else:
             create_folder(self.path)
 
-    def get(self, value_hash: str) -> Dict | None:
+    def get(self, value_hash: str) -> Dict[Any, Any] | None:
         if value_hash in self.cache:
-            return self.cache[value_hash]
+            data: Dict[Any, Any] = self.cache[value_hash]
+            return data
         else:
             return None
 
-    def add(self, value_hash: str, value: Dict) -> None:
+    def add(self, value_hash: str, value: Dict[Any, Any]) -> None:
         self.cache[value_hash] = value
 
     def flush(self) -> None:
@@ -191,10 +200,11 @@ class CacheJSON:
 
 class ProcessLog:
     def __init__(self) -> None:
+        super().__init__()
         self.log: List[str] = []
 
     def add(self, info: str) -> None:
         self.log.append(info)
 
-    def get(self) -> List:
+    def get(self) -> List[str]:
         return self.log
