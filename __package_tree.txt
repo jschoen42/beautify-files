@@ -1,10 +1,10 @@
 beautify-files v0.1.0
-├── cssbeautifier v1.15.2
+├── cssbeautifier v1.15.3
 │   ├── editorconfig v0.17.0
-│   ├── jsbeautifier v1.15.2
+│   ├── jsbeautifier v1.15.3
 │   │   ├── editorconfig v0.17.0
 │   │   └── six v1.17.0
 │   └── six v1.17.0
-├── jsbeautifier v1.15.2 (*)
-└── lxml v5.3.0
+├── jsbeautifier v1.15.3 (*)
+└── lxml v5.3.1
 (*) Package tree already displayed
