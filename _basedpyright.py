@@ -1,31 +1,63 @@
-# uv run _basedpyright.py src
+"""
+    © Jürgen Schoenemeyer, 23.02.2025
+
+    _basedpyright.py
+
+    INSTALL:
+     - uv add basedpyright --dev
+
+    INSTALL STUBS - https://github.com/python/typeshed/tree/main/stubs
+     - uv add lxml-stubs --dev
+     - uv add pandas-stubs --dev
+     - uv add types-beautifulsoup4 --dev
+     - uv add types-openpyxl --dev
+     - uv add types-python-dateutil --dev
+     - uv add types-pyyaml --dev
+     - uv add types-xmltodict --dev
+
+    RUN CLI
+     - uv run _basedpyright.py .
+     - uv run _basedpyright.py src
+     - uv run _basedpyright.py src/main.py
+
+    PUBLIC:
+     - run_pyright(src_path: Path, python_version: str) -> None
+
+    PRIVAT:
+     - format_singular_plural(value: int, text: str) -> str
+"""
+
+from __future__ import annotations
 
 import json
-import os
+import locale
 import platform
 import shutil
 import subprocess
 import sys
 import time
-import locale
-
-from typing import Dict, List
 from argparse import ArgumentParser
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
 from subprocess import CompletedProcess
+from typing import Dict, List
 
 BASE_PATH = Path(sys.argv[0]).parent.parent.resolve()
 RESULT_FOLDER = ".type-check-result"
 
 LINEFEET = "\n"
 
+def format_singular_plural(value: int, text: str) -> str:
+    if value == 1:
+        return f"{value} {text}"
+    return f"{value} {text}s"
+
 def run_basedpyright(src_path: Path, python_version: str) -> None:
 
     if python_version == "":
         try:
-            with open(".python-version", mode="r") as f:
+            with Path.open(Path("python-version"), mode="r") as f:
                 python_version = f.read().strip()
         except OSError:
             python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
@@ -69,7 +101,7 @@ def run_basedpyright(src_path: Path, python_version: str) -> None:
             ".venv/*",
             "src/faster_whisper/*",
             "src/extras/*",
-        ]
+        ],
     }
 
     if not src_path.exists():
@@ -86,14 +118,9 @@ def run_basedpyright(src_path: Path, python_version: str) -> None:
     if name == "":
         name = "."
 
-    npx_path = shutil.which("npx")
-    if not npx_path:
-        print("Error: 'npx' not found")
-        return
-
     text  = f"Python:   {sys.version.replace(LINEFEET, ' ')}\n"
     text += f"Platform: {platform.platform()}\n"
-    text += f"Date:     {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}\n"
+    text += f"Date:     {datetime.now().astimezone().strftime('%d.%m.%Y %H:%M:%S')}\n"
     text += f"Path:     {BASE_PATH}\n"
     text += "\n"
 
@@ -101,17 +128,27 @@ def run_basedpyright(src_path: Path, python_version: str) -> None:
     for key, value in settings.items():
         text += f" - {key}: {value}\n"
 
-    config = "tmp.json"
-    with open(config, mode="w", newline="\n") as config_file:
+    config = Path("tmp.json")
+    with Path.open(config, mode="w", newline="\n") as config_file:
         json.dump(settings, config_file, indent=2)
 
     try:
-        result: CompletedProcess[str] = subprocess.run(["basedpyright", src_path, "--project", config, "--outputjson"], capture_output=True, text=True)
+        basedpyright_path = shutil.which("basedpyright")
+        if not basedpyright_path:
+            print("Error: 'basedpyright' not installed -> uv add basedpyright --dev")
+            sys.exit(1)
+
+        result: CompletedProcess[str] = subprocess.run(
+            [basedpyright_path, src_path, "--project", config, "--outputjson"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
     except Exception as err:
         print(f"error: {err} - basedpyright")
         sys.exit(1)
     finally:
-        os.remove(config)
+        Path.unlink(config)
 
     if result.stderr != "":
         print(f"errorcode: {result.returncode}")
@@ -164,20 +201,21 @@ def run_basedpyright(src_path: Path, python_version: str) -> None:
     footer += f"informations: {summary['informationCount']}, "
     footer += f"duration: {summary['timeInSec']} sec"
 
-    n = len(str(Path(".").absolute())) + 1
+    n = len(str(Path.cwd().absolute())) + 1
 
+    msg_files = 0
     last_file = ""
     error_types: Counter[str] = Counter()
     for diagnostic in diagnostics:
-        file       = Path(diagnostic["file"]).as_posix()
-        error_type = diagnostic["rule"]
-        error      = diagnostic["severity"]
-        range      = diagnostic["range"]["start"]
+        file        = Path(diagnostic["file"]).as_posix()
+        error_type  = diagnostic["rule"]
+        error       = diagnostic["severity"]
+        range_start = diagnostic["range"]["start"]
 
         error_types[error_type] += 1
 
         msg = file[n:]
-        msg += f":{range['line']+1}:{range['character']+1} - {error}: " # 0-based
+        msg += f":{range_start['line']+1}:{range_start['character']+1} - {error}: " # 0-based
         msg += diagnostic["message"]
         msg += f" ({error_type})"
 
@@ -186,6 +224,7 @@ def run_basedpyright(src_path: Path, python_version: str) -> None:
                 text += "\n"
             text += "\n### " + file[n:] + " ###\n"
             last_file = file
+            msg_files += 1
 
         text += "\n" + msg
 
@@ -197,10 +236,18 @@ def run_basedpyright(src_path: Path, python_version: str) -> None:
             text += f"\n - {error_type[0]}: {error_type[1]}"
         text += "\n\n"
 
+    text += "\n"
+
+    footer = "Found "
+    footer += f"{format_singular_plural(summary['errorCount'],'error')}, "
+    footer += f"{format_singular_plural(summary['warningCount'],'warning')}, "
+    footer += f"{format_singular_plural(summary['informationCount'],'information')} in "
+    footer += f"{msg_files} of {format_singular_plural(summary['filesAnalyzed'], 'file')}"
+
     text += footer + "\n"
 
     result_filename = f"BasedPyRight-{python_version}-'{name}'.txt"
-    with open(folder_path / result_filename, mode="w", newline="\n") as f:
+    with Path.open(folder_path / result_filename, mode="w", newline="\n") as f:
         f.write(text)
 
     duration = time.time() - start

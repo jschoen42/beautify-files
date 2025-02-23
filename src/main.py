@@ -1,15 +1,16 @@
 # .venv/Scripts/activate
 # python src/main.py
 
-import sys
-import shutil
+from __future__ import annotations
 
-from utils.globals   import BASE_PATH
-from utils.trace     import Trace
-from utils.file      import create_folder
-from utils.beautify  import beautify_file
+import shutil
+import sys
 
 from rekursion import get_filepaths_ancor
+from utils.beautify import beautify_file
+from utils.file import create_folder
+from utils.globals import BASE_PATH
+from utils.trace import Trace
 
 DATA_PATH = BASE_PATH / "data"
 IMPORT_PATH = DATA_PATH / "import"
@@ -17,7 +18,7 @@ EXPORT_PATH = DATA_PATH / "export"
 
 EXCLUDE = {
     "folder": [".git", ".venv", "__pycache__", "__MACOSX"],
-    "files": []
+    "files": [],
 }
 
 def main() -> None:

@@ -19,3 +19,14 @@ dev = [
     "lxml-stubs>=0.5.1",
     "types-python-dateutil>=2.9.0.20241206",
 ]
+
+[tool.basedpyright]
+deprecateTypingAliases =  false
+reportAny = false
+reportImplicitRelativeImport = false
+reportUnusedCallResult = false
+reportUnknownArgumentType = false
+reportUnknownVariableType = false
+reportUnknownMemberType = false
+reportExplicitAny = false
+

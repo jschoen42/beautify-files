@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 09.02.2025
+    © Jürgen Schoenemeyer, 23.02.2025
 
     PUBLIC:
      - get_filepaths_all( path: Path, exclude: Dict[str, Any] = {"folder": None, "files": None}, show_result: bool = True ) -> Tuple[List[str], List[str], List[str]]
@@ -10,13 +10,14 @@
     PRIVAT:
      - match_not_exclude( name: str, excludes: Dict ) -> bool
 """
+from __future__ import annotations
+
 import fnmatch
-
-from typing import Any, Dict, List, Tuple
 from pathlib import Path
+from typing import Any, Dict, List, Tuple
 
-from utils.trace     import Trace
 from utils.decorator import duration
+from utils.trace import Trace
 
 # exclude = {
 #     "folder": [".git", ".venv", "__pycache__", "__MACOSX"],
@@ -34,11 +35,13 @@ def match_not_exclude( name: str, excludes: None | Dict[str, List[str]] ) -> boo
     return True
 
 @duration("{__name__} '{0}'")
-def get_filepaths_all(
-    path: Path,
-    exclude: Dict[str, Any] = {"folder": None, "files": None},
-    show_result: bool = True
-) -> Tuple[List[str], List[str], List[str]]:
+def get_filepaths_all(path: Path, exclude: Dict[str, Any] | None = None, show_result: bool = True) -> Tuple[List[str], List[str], List[str]]:
+
+    if exclude is None:
+        exclude = {
+            "folder": None,
+            "files": None,
+        }
 
     Trace.action(f"path '{path}'")
 
@@ -76,11 +79,13 @@ def get_filepaths_all(
     return files, folders, errors
 
 @duration("{__name__} '{0}'")
-def get_filepaths_ancor(
-    ancor_path: Path,
-    exclude: Dict[str, Any] = {"folder": None, "files": None},
-    show_result: bool = True
-) -> Tuple[List[str], List[str], List[str]]:
+def get_filepaths_ancor(ancor_path: Path, exclude: Dict[str, Any] | None = None, show_result: bool = True) -> Tuple[List[str], List[str], List[str]]:
+
+    if exclude is None:
+        exclude = {
+            "folder": None,
+            "files": None,
+        }
 
     Trace.action(f"ancor '{ancor_path}'")
 

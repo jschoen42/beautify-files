@@ -1,5 +1,5 @@
 """
-    © Jürgen Schoenemeyer, 07.02.2025
+    © Jürgen Schoenemeyer, 22.02.2025
 
     src/utils/beautify.py
 
@@ -11,20 +11,19 @@
      - expand_js(text: str) -> str:
      - expand_css(text: str) -> str:
 """
+from __future__ import annotations
 
-import os
 import json
-
-from typing import Dict
 from pathlib import Path
+from typing import Dict
 
-import jsbeautifier        # type: ignore[import-untyped]
-import cssbeautifier       # type: ignore[import-untyped]
+import cssbeautifier  # type: ignore[import-untyped]
+import jsbeautifier  # type: ignore[import-untyped]
 from lxml import etree
 
-from utils.trace     import Trace
 from utils.decorator import duration
-from utils.file      import import_text, export_text
+from utils.file import export_text, import_text
+from utils.trace import Trace
 
 # print(etree)
 
@@ -169,7 +168,7 @@ def beautify_file( file_type: str, source_path: Path | str, source_filename: str
     if text is None:
         return False
 
-    mtime = os.stat(source).st_mtime
+    mtime = source.stat().st_mtime
 
     opts = jsbeautifier.default_options()
     opts.indent_size = 2
@@ -189,7 +188,7 @@ def beautify_file( file_type: str, source_path: Path | str, source_filename: str
 
     elif file_type == "XML":
         try:
-            x = etree.fromstring(text)
+            x = etree.fromstring(text)  # noqa: S320
             data = etree.tostring(x, pretty_print=True, encoding=str)
         except ValueError as err:
             Trace.error( f"XML parse error: {err} - {source}" )
